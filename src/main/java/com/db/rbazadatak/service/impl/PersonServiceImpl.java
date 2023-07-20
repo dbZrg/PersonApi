@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -60,19 +59,13 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Transactional
-    public ResponseEntity<String> deletePerson(String oib, Boolean deleteAll) throws IOException {
+    public ResponseEntity<String> deletePerson(String oib) {
         OibValidation.checkOIB(oib);
 
         Optional<Person> person = userRepository.findByOib(oib);
         if (person.isPresent()) {
             userRepository.delete(person.get());
-            if (deleteAll) {
-                // Delete all files for person, active and inactive
-                FileUtils.deleteFiles(oib, null);
-            } else {
-                // Set persons active file to INACTIVE
-                FileUtils.setInactiveStatus(person.get());
-            }
+            FileUtils.setInactiveStatus(person.get());
             return ResponseEntity.ok("Person with OIB:" + person.get().getOib() + " successfully deleted");
         } else {
             throw new EntityNotFoundException("Person with: " + oib + " doesnt exist.");

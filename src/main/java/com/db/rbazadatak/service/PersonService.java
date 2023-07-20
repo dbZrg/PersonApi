@@ -11,5 +11,5 @@ public interface PersonService {
 
     ResponseEntity<Person> findPersonByOib(String oib, Boolean newFile);
 
-    ResponseEntity<String> deletePerson(String oib, Boolean fullDelete) throws IOException;
+    ResponseEntity<String> deletePerson(String oib) throws IOException;
 }

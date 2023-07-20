@@ -72,7 +72,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"firstName\": \"Name\",\r\n    \"lastName\": \"Surname\",\r\n    \"oib\": \"05286530086\",\r\n    \"status\": \"ACTIVE\"\r\n}",
+					"raw": "{\r\n    \"firstName\": \"dfsfds\",\r\n    \"lastName\": \"fsdfsd\",\r\n    \"oib\": \"05286530086\",\r\n    \"status\": \"ACTIVE\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
