@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class RestExceptionHandler {
 
     @ExceptionHandler(value = IllegalArgumentException.class)
-    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException exception) {
+    public ResponseEntity<Object> handleIllegalArgument(IllegalArgumentException exception) {
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, "Illegal Argument", exception));
     }
 
@@ -35,12 +35,12 @@ public class RestExceptionHandler {
     }
 
     @ExceptionHandler(value = ConstraintViolationException.class)
-    public ResponseEntity<Object> handConstraintViolationException(ConstraintViolationException exception) {
+    public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException exception) {
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, "Constraint Violation", exception));
     }
 
     @ExceptionHandler(value = EntityNotFoundException.class)
-    public ResponseEntity<Object> handEntityNotFoundException(EntityNotFoundException exception) {
+    public ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException exception) {
         return buildResponseEntity(new ApiError(HttpStatus.NOT_FOUND, "Entity not found", exception));
     }
 
