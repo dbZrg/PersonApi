@@ -164,7 +164,7 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/api/person/:oib?deleteAll=true",
+					"raw": "http://localhost:8080/api/person/:oib",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -174,12 +174,6 @@
 						"api",
 						"person",
 						":oib"
-					],
-					"query": [
-						{
-							"key": "deleteAll",
-							"value": "true"
-						}
 					],
 					"variable": [
 						{
