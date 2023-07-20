@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -58,6 +59,7 @@ public class PersonServiceImpl implements PersonService {
         return ResponseEntity.ok().body(person);
     }
 
+    @Transactional
     public ResponseEntity<String> deletePerson(String oib, Boolean deleteAll) throws IOException {
         OibValidation.checkOIB(oib);
 
