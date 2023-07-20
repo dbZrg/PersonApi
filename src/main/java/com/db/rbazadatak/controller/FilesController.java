@@ -1,20 +1,14 @@
 package com.db.rbazadatak.controller;
 
-import com.db.rbazadatak.model.Person;
 import com.db.rbazadatak.payload.FileRequestDTO;
-import com.db.rbazadatak.service.FileService;
 import com.db.rbazadatak.service.impl.FileServiceImpl;
-import com.db.rbazadatak.service.impl.PersonServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/file/")
