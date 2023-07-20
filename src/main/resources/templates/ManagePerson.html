@@ -24,7 +24,7 @@
                 } else if (action === 'Delete') {
                     requestType = 'DELETE';
                     successMessage = function(response) {
-                        alert("Person with OIB " + response.oib + " has been deleted.");
+                        alert("Person with OIB " + oib + " has been deleted.");
                     }
                 }
 
@@ -73,7 +73,8 @@
     </script>
 </head>
 <body>
-<h2>Manage Person</h2>
+<h1>Manage Person</h1>
+<h2>Find or delete</h2>
 <form>
     <label for="personOib">OIB:</label><br>
     <input type="text" id="personOib" name="oib"><br>
@@ -85,7 +86,7 @@
     <button id="submitBtn">Submit</button>
 </form>
 
-
+<h2>Add new person</h2>
 <form>
     <label for="firstName">First Name:</label><br>
     <input type="text" id="firstName" name="firstName"><br>

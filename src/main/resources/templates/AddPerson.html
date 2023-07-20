@@ -20,7 +20,7 @@
           contentType: 'application/json',
           data: JSON.stringify(person),
           headers: {
-            'Authorization': 'Basic ' + btoa('admin:password')
+            'Authorization': 'Basic ' + btoa('apiUser:password')
           },
           success: function (response) {
             alert("Person successfully added");
