@@ -7,12 +7,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
-import java.util.Scanner;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @Slf4j
 @Component
@@ -34,9 +36,9 @@ public class FileUtils {
      * @param person The person for whom the file is to be generated.
      */
     public static void generateFile(Person person) {
-        File activeFile = findActiveFile(person);
+        Optional<File> activeFile = findActiveFile(person.getOib());
 
-        if (activeFile != null) {
+        if (activeFile.isPresent()) {
             log.debug("An active file already exists for this OIB");
             return;
         }
@@ -78,16 +80,16 @@ public class FileUtils {
      * @param person The person whose status is to be updated.
      */
     public static void setInactiveStatus(Person person) {
-        File activeFile = findActiveFile(person);
+        Optional<File> activeFile = findActiveFile(person.getOib());
 
-        if (activeFile == null) {
+        if (activeFile.isEmpty()) {
             log.debug("No active file exists for OIB: " + person.getOib());
             return;
         }
 
         try {
-            updatePersonStatusToFile(activeFile, Status.INACTIVE);
-            log.info("File status set to INACTIVE: " + activeFile.getName());
+            updatePersonStatusToFile(activeFile.get(), Status.INACTIVE);
+            log.info("File status set to INACTIVE: " + activeFile.get().getName());
         } catch (IOException e) {
             log.error("File status update failed", e);
         }
@@ -117,93 +119,102 @@ public class FileUtils {
     }
 
     /**
-     * Deletes all files for a person that start with the person's OIB.
-     * It checks each file in the directory, and if the file name starts with the person's OIB, it deletes the file.
-     *
-     * @param person The person whose files are to be deleted.
-     */
-    public static void deleteAllFilesForPerson(Person person) {
-        File directory = new File(FILE_DIR);
-        File[] files = directory.listFiles();
-
-        if (files != null) {
-            for (File file : files) {
-                if (file.getName().startsWith(person.getOib())) {
-                    if (file.delete()) {
-                        log.info("File deleted: " + file.getName());
-                    } else {
-                        log.error("Failed to delete file: " + file.getName());
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Searches through files in the specified directory, and returns the first file
      * that starts with the person's OIB and contains the 'ACTIVE' status.
      *
-     * @param person The person for whom the active file is sought.
-     * @return The active file, or null if no such file is found.
+     * @param oib The person for whom the active file is sought.
+     * @return Optional containing the active file, or an empty Optional if no such file is found.
      */
-    public static File findActiveFile(Person person) {
-        File directory = new File(FILE_DIR);
-        File[] files = directory.listFiles();
-
-        if (files != null) {
-            for (File file : files) {
-                if (file.getName().startsWith(person.getOib()) && containsStatus(file, Status.ACTIVE)) {
-                    return file;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Checks if a file contains the 'ACTIVE' status.
-     *
-     * @param file The file to be checked.
-     * @return True if the file contains the 'ACTIVE' status, false otherwise.
-     */
-    public static boolean containsStatus(File file, Status status) {
-        try (Scanner scanner = new Scanner(file)) {
-            while (scanner.hasNextLine()) {
-                String data = scanner.nextLine();
-                String[] splitData = data.split(DELIMITER);
-                if (splitData.length >= 4 && status.toString().equals(splitData[3])) {
-                    return true;
+    public static Optional<File> findActiveFile(String oib) {
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(FILE_DIR), oib + "*")) {
+            for (Path path : directoryStream) {
+                File file = path.toFile();
+                if (containsStatus(file, Status.ACTIVE)) {
+                    return Optional.of(file);
                 }
             }
         } catch (IOException e) {
+            throw new RuntimeException("Error reading directory: " + FILE_DIR, e);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Checks if a file contains a specific status.
+     *
+     * @param file the file to check
+     * @param status the status to look for
+     * @return true if the status is found in the file, false otherwise
+     */
+    public static boolean containsStatus(File file, Status status) {
+        try (Stream<String> lines = Files.lines(file.toPath(), StandardCharsets.UTF_8)) {
+            return lines.anyMatch(line -> {
+                String[] splitData = line.split(DELIMITER);
+                return splitData.length >= 4 && status.toString().equals(splitData[3]);
+            });
+        } catch (IOException e) {
             throw new RuntimeException("Error reading file: " + file.getName(), e);
         }
-        return false;
     }
 
 
     /**
-     * This method searches a specified directory for a file whose name starts with a specific identification number (oib).
+     * Searches a specified directory for a file whose name starts with a specific identification number (oib).
      *
      * @param oib The specific identification number that the desired file's name should start with.
-     * @return The first file found whose name starts with the given 'oib'. If no such file is found, the method returns null.
+     * @return An Optional containing the first file found whose name starts with the given 'oib'. If no such file is found, the Optional is empty.
+     * @throws IOException if an I/O error occurs
      */
-    public static File findFileByOib(String oib) throws IOException {
+    public static Optional<File> findFileByOib(String oib) throws IOException {
         Path directoryPath = Paths.get(FILE_DIR);
 
-        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(
-                directoryPath,
-                path -> path.toFile().getName().startsWith(oib)
-        )) {
-
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directoryPath, oib + "*")) {
             Iterator<Path> iterator = directoryStream.iterator();
-            if (iterator.hasNext()) {
-                return iterator.next().toFile();
-            } else {
-                return null;
-            }
+            return iterator.hasNext() ? Optional.of(iterator.next().toFile()) : Optional.empty();
         }
     }
 
+    /**
+     * Deletes files based on given oib and status parameters.
+     *
+     * @param oib the oib to match; if null, matches any oib
+     * @param status the status to match; if null, matches any status
+     */
+    public static void deleteFiles(String oib, String status) {
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(FILE_DIR))) {
+            for (Path path : directoryStream) {
+                if (isTextFile(path)) {
+                    processFileDeletion(path, oib, status);
+                }
+            }
+        } catch (IOException e) {
+            log.error("Error accessing directory: " + FILE_DIR, e);
+            throw new RuntimeException("Error accessing files", e);
+        }
+    }
+
+    private static boolean isTextFile(Path filePath) {
+        return Files.isRegularFile(filePath) && filePath.toString().endsWith(".txt");
+    }
+
+    private static void processFileDeletion(Path filePath, String oib, String status) {
+        try (Stream<String> lines = Files.lines(filePath)) {
+            boolean shouldDelete = lines.anyMatch(line -> {
+                String[] parts = line.split(","); // assuming comma as delimiter
+                if (parts.length <= 3) {
+                    return false;
+                }
+                boolean oibMatches = oib == null || oib.equals(parts[2]);
+                boolean statusMatches = status == null || status.equals(parts[3]);
+                return oibMatches && statusMatches;
+            });
+            if (shouldDelete) {
+                Files.delete(filePath);
+            }
+        } catch (IOException e) {
+            log.error("Error processing file: " + filePath, e);
+            throw new RuntimeException("Error deleting files", e);
+        }
+    }
 
 }

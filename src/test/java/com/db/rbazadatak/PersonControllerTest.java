@@ -97,9 +97,9 @@ public class PersonControllerTest {
                 .andExpect(jsonPath("$.lastName").value(person.getLastName()))
                 .andExpect(jsonPath("$.status").value(person.getStatus().toString()));
 
-        File activeFile = FileUtils.findActiveFile(person);
-        assertNotNull(activeFile);
-        activeFile.delete();
+        Optional<File> activeFile = FileUtils.findActiveFile(person.getOib());
+        assertTrue(activeFile.isPresent());
+        activeFile.get().delete();
     }
 
     @Test
@@ -115,8 +115,9 @@ public class PersonControllerTest {
         Optional<Person> deletedPerson = personRepository.findByOib(person.getOib());
         assertTrue(deletedPerson.isEmpty());
 
-        File inactiveFile = FileUtils.findFileByOib(person.getOib());
-        assertTrue(FileUtils.containsStatus(inactiveFile, Status.INACTIVE));
-        inactiveFile.delete();
+        Optional<File> inactiveFile = FileUtils.findFileByOib(person.getOib());
+        assertTrue(inactiveFile.isPresent());
+        assertTrue(FileUtils.containsStatus(inactiveFile.get(), Status.INACTIVE));
+        inactiveFile.get().delete();
     }
 }

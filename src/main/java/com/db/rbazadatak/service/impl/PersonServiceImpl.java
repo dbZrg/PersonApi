@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -57,7 +58,7 @@ public class PersonServiceImpl implements PersonService {
         return ResponseEntity.ok().body(person);
     }
 
-    public ResponseEntity<String> deletePerson(String oib, Boolean deleteAll) {
+    public ResponseEntity<String> deletePerson(String oib, Boolean deleteAll) throws IOException {
         OibValidation.checkOIB(oib);
 
         Optional<Person> person = userRepository.findByOib(oib);
@@ -65,7 +66,7 @@ public class PersonServiceImpl implements PersonService {
             userRepository.delete(person.get());
             if (deleteAll) {
                 // Delete all files for person, active and inactive
-                FileUtils.deleteAllFilesForPerson(person.get());
+                FileUtils.deleteFiles(oib, null);
             } else {
                 // Set persons active file to INACTIVE
                 FileUtils.setInactiveStatus(person.get());

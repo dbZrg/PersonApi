@@ -27,7 +27,52 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"firstName\": \"John\",\r\n    \"lastName\": \"Doe\",\r\n    \"oib\": \"05286530086\",\r\n    \"status\": \"ACTIVE\"\r\n}",
+					"raw": "{\r\n    \"firstName\": \"dfsfds\",\r\n    \"lastName\": \"fsdfsd\",\r\n    \"oib\": \"05286530086\",\r\n    \"status\": \"ACTIVE\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/person/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"person",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete files",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "apiUser",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Name\",\r\n    \"lastName\": \"Surname\",\r\n    \"oib\": \"05286530086\",\r\n    \"status\": \"ACTIVE\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -119,7 +164,7 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/api/person/:oib?deleteAll=false",
+					"raw": "http://localhost:8080/api/person/:oib?deleteAll=true",
 					"protocol": "http",
 					"host": [
 						"localhost"
