@@ -1,0 +1,101 @@
+<html>
+<head>
+    <title>Manage Person</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#submitBtn').click(function (e) {
+                e.preventDefault();
+                const oib = $('#personOib').val();
+                const action = $('#action').val();
+                let requestType;
+                let successMessage;
+
+                if (action === 'Find') {
+                    requestType = 'GET';
+                    successMessage = function(response) {
+                        alert("Person:   \n"
+                            + "first name: " + response.firstName + "\n"
+                            + "last name: " + response.lastName + "\n"
+                            + "oib: " + response.oib + "\n"
+                            + "status: " + response.status + "\n"
+                        );
+                    }
+                } else if (action === 'Delete') {
+                    requestType = 'DELETE';
+                    successMessage = function(response) {
+                        alert("Person with OIB " + response.oib + " has been deleted.");
+                    }
+                }
+
+                $.ajax({
+                    url: 'http://localhost:8080/api/person/' + oib,
+                    type: requestType,
+                    headers: {
+                        'Authorization': 'Basic ' + btoa('apiUser:password')
+                    },
+                    success: successMessage,
+                    error: function (error) {
+                        alert(error.responseJSON.debugMessage);
+                    }
+                });
+            });
+        });
+
+        $(document).ready(function () {
+            $('#submitBtn2').click(function (e) {
+                e.preventDefault();
+
+                var person = {
+                    firstName: $('#firstName').val(),
+                    lastName: $('#lastName').val(),
+                    oib: $('#oib').val(),
+                    status: $('#status').val()
+                };
+
+                $.ajax({
+                    url: 'http://localhost:8080/api/person/',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(person),
+                    headers: {
+                        'Authorization': 'Basic ' + btoa('apiUser:password')
+                    },
+                    success: function (response) {
+                        alert("Person successfully added");
+                    },
+                    error: function (error) {
+                        alert(error.responseJSON.debugMessage);
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+<h2>Manage Person</h2>
+<form>
+    <label for="personOib">OIB:</label><br>
+    <input type="text" id="personOib" name="oib"><br>
+    <label for="action">Action:</label><br>
+    <select id="action" name="action">
+        <option value="Find">Find</option>
+        <option value="Delete">Delete</option>
+    </select><br>
+    <button id="submitBtn">Submit</button>
+</form>
+
+
+<form>
+    <label for="firstName">First Name:</label><br>
+    <input type="text" id="firstName" name="firstName"><br>
+    <label for="lastName">Last Name:</label><br>
+    <input type="text" id="lastName" name="lastName"><br>
+    <label for="oib">OIB:</label><br>
+    <input type="text" id="oib" name="oib"><br>
+    <label for="status">Status:</label><br>
+    <input type="text" id="status" name="status"><br>
+    <button id="submitBtn2">Submit</button>
+</form>
+</body>
+</html>
