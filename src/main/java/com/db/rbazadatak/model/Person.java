@@ -29,4 +29,9 @@ public class Person {
     @NotNull
     private Status status;
 
+    // only cascade on save, we want to keep person file history (inactive files)
+    @JsonIgnore
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "file_id", referencedColumnName = "id")
+    private File file;
 }

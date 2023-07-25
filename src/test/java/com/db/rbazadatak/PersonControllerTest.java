@@ -104,9 +104,17 @@ public class PersonControllerTest {
 
     @Test
     public void testDeletePerson() throws Exception {
+
         personRepository.save(person);
 
-        FileUtils.generateFile(person);
+        mockMvc.perform(get("/api/person/" + person.getOib())
+                        .with(httpBasic(username, password)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.oib").value(person.getOib()))
+                .andExpect(jsonPath("$.firstName").value(person.getFirstName()))
+                .andExpect(jsonPath("$.lastName").value(person.getLastName()))
+                .andExpect(jsonPath("$.status").value(person.getStatus().toString()));
 
         mockMvc.perform(delete("/api/person/" + person.getOib())
                         .with(httpBasic(username, password)))

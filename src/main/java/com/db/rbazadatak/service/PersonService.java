@@ -9,7 +9,7 @@ import java.io.IOException;
 public interface PersonService {
     ResponseEntity<Person> savePerson(PersonDTO personDTO);
 
-    ResponseEntity<Person> findPersonByOib(String oib, Boolean newFile);
+    ResponseEntity<Person> findPersonByOib(String oib, Boolean newFile) throws IOException;
 
     ResponseEntity<String> deletePerson(String oib) throws IOException;
 }

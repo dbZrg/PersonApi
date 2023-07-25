@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api/person/")
 @CrossOrigin
@@ -57,7 +59,7 @@ public class PersonController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content)
     })
-    public ResponseEntity<Person> findPerson(@PathVariable String oib, @RequestParam(defaultValue = "false") Boolean newFile) {
+    public ResponseEntity<Person> findPerson(@PathVariable String oib, @RequestParam(defaultValue = "false") Boolean newFile) throws IOException {
         return personService.findPersonByOib(oib, newFile);
     }
 
@@ -75,7 +77,7 @@ public class PersonController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content)
     })
-    public ResponseEntity<String> deletePerson(@PathVariable String oib) {
+    public ResponseEntity<String> deletePerson(@PathVariable String oib) throws IOException {
         return personService.deletePerson(oib);
     }
 }
