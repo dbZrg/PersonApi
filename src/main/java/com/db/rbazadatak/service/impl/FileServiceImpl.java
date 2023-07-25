@@ -40,6 +40,7 @@ public class FileServiceImpl implements FileService {
         this.fileRepository = fileRepository;
     }
 
+    @Transactional
     public File createFile(File file) throws IOException {
         String path = FILE_DIR + file.getOib() + System.currentTimeMillis() + ".txt";
         file.setFilePath(path);
