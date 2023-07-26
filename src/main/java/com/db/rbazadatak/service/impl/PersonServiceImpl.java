@@ -53,11 +53,15 @@ public class PersonServiceImpl implements PersonService {
         Person person = personRepository.findByOib(oib)
                 .orElseThrow(() -> new EntityNotFoundException("Person with: " + oib + " doesnt exist."));
 
-        File personFile = new File();
-        modelMapper.map(person, personFile);
-        File file = fileService.createFile(personFile);
-        person.setFile(file);
-        personRepository.save(person);
+        if (person.getFile() == null) {
+            File personFile = new File();
+            modelMapper.map(person, personFile);
+            File file = fileService.createFile(personFile);
+            person.setFile(file);
+            personRepository.save(person);
+        } else {
+            log.debug("Person has active file");
+        }
         return ResponseEntity.ok().body(person);
     }
 
